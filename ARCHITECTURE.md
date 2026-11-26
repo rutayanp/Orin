@@ -72,3 +72,12 @@ Unit tests for domain validation, timezones/DST, money, undo and deduplication. 
 5. Explicit confirmation for uncertain receipt matches and bulk changes.
 6. Model and OpenClaw versions selected by compatibility spike and benchmark.
 7. Notification behavior, iOS signing and retention policy require separate review.
+
+## Architectural evolvability and workload control
+Owner-approved direction: avoiding structural retrofits, independent computational workload control, security by design and incremental measured performance optimization are high-priority requirements. Design stable seams now, implement only justified capabilities. Avoid speculative frameworks and distributed infrastructure.
+
+Proposed workload contract: initialize, readiness/health, execute with deadline and cancellation, drain/shutdown, resource metrics, and load/unload where applicable. Each workload has configurable concurrency and resource policy. Cancellation must report whether work actually stopped; isolate native runtimes in processes when required for bounded recovery. Initial implementation may use simple adapters and bounded queues, not a generalized distributed scheduler. Critical scheduling, authentication and persistence must remain available under inference failure or overload. Prioritize critical services, reject or defer heavy work under resource pressure, and test recovery. Never rely on GPU memory limits that the platform cannot enforce.
+
+Stable versioned API and domain contracts separate clients, orchestration, inference, persistence and hardware. Use additive compatible changes where practical, explicit migrations and backup/restore for incompatible changes. Model-specific behavior belongs in adapters; domain state is model-independent. New tools must declare typed contracts, permissions and side effects. Future extensions require review and regression tests. No mandatory plugin framework or event bus initially.
+
+Optimization policy: establish baseline measurements, identify bottleneck, propose targeted change, compare correctness and p50/p95 latency, peak memory and throughput, retain rollback. Do not optimize unmeasured bottlenecks or sacrifice security. Acceptance includes replacing a mock inference provider without domain changes, independently stopping a workload without losing reminders or committed data, and overload/restart tests. Detailed lifecycle API, resource policies and compatibility strategy remain proposals for gatekeeper review.
