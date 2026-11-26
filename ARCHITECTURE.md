@@ -53,7 +53,7 @@ Printing: render deterministic agenda, submit via IPP, track job ID. Do not blin
 Weather: network-only feature, cached forecast marked stale; offline core unaffected.
 
 ## Security and privacy
-Single-user initial scope. Pair device with revocable random credential stored in iOS Keychain; authenticated TLS for production, private LAN or optional VPN. No public port forwarding. Dev unauthenticated mode binds loopback only. Deny outbound access by default except explicit weather, updates and optional remote access. No arbitrary URL fetch or shell tool. Validate uploads by size, type and content; isolate parsers with time/resource limits, prevent path traversal and SSRF. Treat prompt injection as untrusted input; tool allowlists and confirmation policies enforced outside LLM. Confirm destructive/bulk actions, external side effects when ambiguous, and sensitive disclosures. Logs redact credentials and personal payloads. Backups encrypted where feasible; restore tested. No secrets, personal data or weights in Git.
+Closed household membership; no public registration, passwords, recovery website or client-facing administration API. Owner-approved requirement: user and device provisioning and revocation require direct local Orin terminal access, not SSH, iPhone or agent tools. Proposed authentication: TLS 1.3 with mutual device authentication, pinned server trust, explicit active device allowlist and hardware-backed client keys where supported. Enrollment is owner-initiated, short-lived, single-use and bound to the intended device, with explicit local confirmation; no permanent enrollment listener. Revocation must invalidate active sessions. Every request derives identity from authenticated device mapping, never voice or model claims. Private user data and explicitly shared household data are separated before retrieval and inference. No public API ports; optional VPN requires review. No arbitrary shell or user-management tools exposed to AI. Validate uploads, isolate parsers, enforce tool allowlists and confirmations, redact logs. Encrypt storage and backups subject to validated Jetson boot and recovery design. No secrets, personal data or weights in Git.
 
 ## Portability and deployment
 Same source and contracts across AMD64/ARM64; separate CPU and Jetson CUDA images pinned to compatible JetPack/L4T versions. Docker Compose base plus Jetson override; persistent data and model volumes outside containers. CPU mock tests in CI; real CPU inference tests opt-in; ARM64 build and on-device GPU smoke tests before release. Native iOS build requires macOS/Xcode. Pin dependencies and model checksums; verify licenses. Health checks, restart policies, graceful shutdown, database backup before migration, documented rollback (restore if migration irreversible). No automatic model downloads in production.
@@ -68,7 +68,7 @@ Unit tests for domain validation, timezones/DST, money, undo and deduplication. 
 1. Modular monolith plus isolated runtime processes vs more services.
 2. REST/multipart and polling first vs streaming from day one.
 3. SQLite relational state plus event audit (not full event sourcing).
-4. Local pairing/TLS first; optional VPN later.
+4. Terminal-only administration approved by owner; mTLS enrollment, storage encryption and optional VPN details remain proposed.
 5. Explicit confirmation for uncertain receipt matches and bulk changes.
 6. Model and OpenClaw versions selected by compatibility spike and benchmark.
 7. Notification behavior, iOS signing and retention policy require separate review.
