@@ -1,0 +1,36 @@
+name: Orin CI
+on:
+  pull_request:
+  push:
+    branches: [main, foundation]
+permissions:
+  contents: read
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify architecture documents
+        run: |
+          for f in ARCHITECTURE.md REQUIREMENTS.md ROADMAP.md AGENTS.md docs/TESTING.md docs/adr/0001-foundation.md; do
+            test -s "$f" || exit 1
+          done
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Determine implementation status
+        id: scope
+        shell: bash
+        run: |
+          if [[ -d backend || -d tests || -f pyproject.toml || -f compose.yaml ]]; then
+            echo "implemented=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "implemented=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Documentation-only phase; application tests not yet implemented."
+          fi
+      - name: Require test runner once implementation begins
+        if: steps.scope.outputs.implemented == 'true'
+        run: |
+          test -f scripts/ci.sh
+          bash scripts/ci.sh
